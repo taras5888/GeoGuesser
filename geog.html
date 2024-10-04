@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Street View Game</title>
+    <style>
+        /* Установка стилей для элементов страницы */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #map, #street-view {
+            width: 100%;
+            height: 100%;
+            display: none; /* Скрываем карту и панораму до старта игры */
+        }
+    </style>
+    <!-- Подключение Google Maps JavaScript API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=ВАШ_КЛЮЧ_API&libraries=places"></script>
+</head>
+<body>
+    <!-- Кнопка для начала игры -->
+    <button id="start-button">Почати гру</button>
+
+    <!-- Контейнер для режима просмотра улиц -->
+    <div id="street-view"></div>
+
+    <script>
+        let panorama;
+
+        // Функция для старта игры
+        function startGame() {
+            document.getElementById('start-button').style.display = 'none'; // Скрываем кнопку
+            document.getElementById('street-view').style.display = 'block'; // Показываем панораму
+
+            // Инициализация Google Street View
+            const sv = new google.maps.StreetViewService();
+
+            // Поиск случайной точки на карте, где есть Street View
+            getRandomStreetViewLocation(sv);
+        }
+
+        // Функция для поиска доступной точки Street View
+        function getRandomStreetViewLocation(streetViewService) {
+            // Генерация случайных координат в пределах выбранной области (например, в Европе)
+            const randomLat = 40 + (Math.random() * 20); // Генерация широты (например, от 40 до 60)
+            const randomLng = -10 + (Math.random() * 40); // Генерация долготы (например, от -10 до 30)
+
+            const latLng = new google.maps.LatLng(randomLat, randomLng);
+
+            // Проверяем наличие режима Street View по этим координатам
+            streetViewService.getPanorama({location: latLng, radius: 50000}, function(data, status) {
+                if (status === google.maps.StreetViewStatus.OK) {
+                    // Если панорама найдена, загружаем ее
+                    initializeStreetView(data.location.latLng);
+                } else {
+                    // Если нет, пробуем снова
+                    console.log('Панорама не найдена, ищем снова...');
+                    getRandomStreetViewLocation(streetViewService);
+                }
+            });
+        }
+
+        // Инициализация Street View Panorama по найденной точке
+        function initializeStreetView(position) {
+            // Устанавливаем Street View панораму в контейнер
+            panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('street-view'),
+                {
+                    position: position, // Позиция для отображения
+                    pov: { heading: 165, pitch: 0 }, // Параметры вида
+                    zoom: 1, // Масштаб
+                }
+            );
+
+            // Отображаем панораму с возможностью перемещения
+            console.log('Street View загружен на позиции: ', position);
+        }
+
+        // Привязка кнопки для начала игры
+        document.getElementById('start-button').addEventListener('click', startGame);
+    </script>
+</body>
+</html>
