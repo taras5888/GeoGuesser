@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoGuessr Clone</title>
+    <title>GeoGuessr Clone with Mapillary</title>
     <style>
         body, html {
             margin: 0;
@@ -34,8 +34,8 @@
             display: none; /* Скрыть панораму, пока не начата игра */
         }
     </style>
-    <!-- Подключение библиотеки Mapillary -->
-<script src="https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.js"></script>
+    <!-- Подключаем библиотеку Mapillary.js -->
+    <script src="https://unpkg.com/mapillary-js@2.20.0/dist/mapillary.min.js"></script>
 </head>
 <body>
     <!-- Кнопка для старта игры -->
@@ -45,44 +45,39 @@
     <div id="panorama-container"></div>
 
     <script>
-        // Создаем глобальные переменные для Mapillary
         let mly;
 
-        // Функция для случайного выбора панорамы
+        // Функция для старта игры
         async function startGame() {
-            // Скрываем кнопку
-            document.getElementById('start-button').style.display = 'none';
-            
-            // Показываем панорамный контейнер
-            document.getElementById('panorama-container').style.display = 'block';
+            document.getElementById('start-button').style.display = 'none'; // Скрываем кнопку
+            document.getElementById('panorama-container').style.display = 'block'; // Показываем панораму
 
-            // Генерируем случайные координаты в диапазоне, например, Европа
-            const randomLat = 40 + (Math.random() * 20); // Широта от 40 до 60
-            const randomLng = -10 + (Math.random() * 40); // Долгота от -10 до 30
-
-            // Инициализация Mapillary
+            // Инициализация Mapillary Viewer
             mly = new Mapillary.Viewer(
-                'panorama-container',             // ID контейнера для панорамы
-                'MLY|27285257554421673|af89aca72ff827de19619c6b4cc28448',              // Ваш API ключ Mapillary
+                'panorama-container',         // ID контейнера для панорамы
+                'MLY|27285257554421673|8e590ed95f77e7e6e16fc3937579cb70', // Замените на ваш Client Token Mapillary
                 null,
                 {
                     component: {
-                        cover: false,             // Скрыть начальное покрытие
-                        navigation: true,         // Включить навигацию
-                        sequence: true            // Включить последовательности
+                        cover: false,          // Отключить начальное покрытие
+                        navigation: true,      // Включить навигацию
+                        sequence: true         // Включить последовательности изображений
                     }
                 }
             );
 
-            // Пытаемся найти панораму по случайным координатам
-            findRandomPanorama(randomLat, randomLng);
+            // Переход на случайную локацию
+            setRandomStreetViewLocation();
         }
 
-        // Функция для поиска случайной панорамы с помощью API Mapillary
-        async function findRandomPanorama(lat, lng) {
-            const url = `https://graph.mapillary.com/images?access_token=ВАШ_КЛЮЧ_MAPILLARY&fields=id,geometry&limit=1&lat=${lat}&lon=${lng}&radius=50000`;
+        // Функция для поиска и перехода на случайную панораму
+        async function setRandomStreetViewLocation() {
+            const randomLat = 40 + (Math.random() * 20); // Генерация случайной широты (например, в Европе)
+            const randomLng = -10 + (Math.random() * 40); // Генерация случайной долготы
 
-            // Запрашиваем ближайшую панораму в радиусе 50 км от случайных координат
+            const url = `https://graph.mapillary.com/images?access_token=ВАШ_CLIENT_TOKEN_MAPILLARY&fields=id,geometry&limit=1&lat=${randomLat}&lon=${randomLng}&radius=50000`;
+
+            // Поиск ближайшей панорамы в радиусе 50 км от случайных координат
             try {
                 const response = await fetch(url);
                 const data = await response.json();
@@ -95,16 +90,16 @@
                         console.log('Панорама загружена:', imageId);
                     });
                 } else {
-                    // Если нет панорамы, пробуем снова с новыми координатами
+                    // Если панорама не найдена, ищем снова
                     console.log('Панорама не найдена, ищем снова...');
-                    findRandomPanorama(40 + Math.random() * 20, -10 + Math.random() * 40);
+                    setRandomStreetViewLocation();
                 }
             } catch (error) {
                 console.error('Ошибка поиска панорамы:', error);
             }
         }
 
-        // Привязка события к кнопке
+        // Привязка кнопки для начала игры
         document.getElementById('start-button').addEventListener('click', startGame);
     </script>
 </body>
