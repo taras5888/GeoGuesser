@@ -52,10 +52,10 @@
             document.getElementById('start-button').style.display = 'none'; // Скрываем кнопку
             document.getElementById('panorama-container').style.display = 'block'; // Показываем панораму
 
-            // Инициализация Mapillary Viewer
+            // Инициализация Mapillary Viewer с вашим токеном
             mly = new Mapillary.Viewer(
                 'panorama-container',         // ID контейнера для панорамы
-                'MLY|27285257554421673|8e590ed95f77e7e6e16fc3937579cb70', // Замените на ваш Client Token Mapillary
+                'MLY|27285257554421673|8e590ed95f77e7e6e16fc3937579cb70', // Ваш Client Token Mapillary
                 null,
                 {
                     component: {
@@ -75,7 +75,7 @@
             const randomLat = 40 + (Math.random() * 20); // Генерация случайной широты (например, в Европе)
             const randomLng = -10 + (Math.random() * 40); // Генерация случайной долготы
 
-            const url = `https://graph.mapillary.com/images?access_token=ВАШ_CLIENT_TOKEN_MAPILLARY&fields=id,geometry&limit=1&lat=${randomLat}&lon=${randomLng}&radius=50000`;
+            const url = `https://graph.mapillary.com/images?access_token=MLY|27285257554421673|8e590ed95f77e7e6e16fc3937579cb70&fields=id,geometry&limit=1&lat=${randomLat}&lon=${randomLng}&radius=50000`;
 
             // Поиск ближайшей панорамы в радиусе 50 км от случайных координат
             try {
